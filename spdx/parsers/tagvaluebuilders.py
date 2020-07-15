@@ -565,14 +565,27 @@ class PackageBuilder(object):
         """
         Create a package for the SPDX Document.
         name - any string.
-        Raise CardinalityError if package already defined.
         """
-        if not self.package_set:
-            self.package_set = True
-            doc.package = package.Package(name=name)
-            return True
-        else:
-            raise CardinalityError('Package::Name')
+        doc.packages.append(package.Package(name=name))
+        self.package_set = True
+        self.package_spdx_id_set = False
+        self.package_vers_set = False
+        self.package_file_name_set = False
+        self.package_supplier_set = False
+        self.package_originator_set = False
+        self.package_down_location_set = False
+        self.package_files_analyzed_set = False
+        self.package_home_set = False
+        self.package_verif_set = False
+        self.package_chk_sum_set = False
+        self.package_source_info_set = False
+        self.package_conc_lics_set = False
+        self.package_license_declared_set = False
+        self.package_license_comment_set = False
+        self.package_cr_text_set = False
+        self.package_summary_set = False
+        self.package_desc_set = False
+        self.package_comment_set = False
 
     def set_pkg_spdx_id(self, doc, spdx_id):
         """
@@ -583,7 +596,8 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_spdx_id_set:
             if validations.validate_pkg_spdx_id(spdx_id):
-                doc.package.spdx_id = spdx_id
+                # Set ID on most recently added package.
+                doc.packages[-1].spdx_id = spdx_id
                 self.package_spdx_id_set = True
                 return True
             else:
@@ -601,7 +615,8 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_vers_set:
             self.package_vers_set = True
-            doc.package.version = version
+            # Set version on most recently added package.
+            doc.packages[-1].version = version
             return True
         else:
             raise CardinalityError('Package::Version')
@@ -616,7 +631,7 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_file_name_set:
             self.package_file_name_set = True
-            doc.package.file_name = name
+            doc.packages[-1].file_name = name
             return True
         else:
             raise CardinalityError('Package::FileName')
@@ -632,7 +647,7 @@ class PackageBuilder(object):
         if not self.package_supplier_set:
             self.package_supplier_set = True
             if validations.validate_pkg_supplier(entity):
-                doc.package.supplier = entity
+                doc.packages[-1].supplier = entity
                 return True
             else:
                 raise SPDXValueError('Package::Supplier')
@@ -650,7 +665,7 @@ class PackageBuilder(object):
         if not self.package_originator_set:
             self.package_originator_set = True
             if validations.validate_pkg_originator(entity):
-                doc.package.originator = entity
+                doc.packages[-1].originator = entity
                 return True
             else:
                 raise SPDXValueError('Package::Originator')
@@ -667,7 +682,7 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_down_location_set:
             self.package_down_location_set = True
-            doc.package.download_location = location
+            doc.packages[-1].download_location = location
             return True
         else:
             raise CardinalityError('Package::DownloadLocation')
@@ -683,8 +698,7 @@ class PackageBuilder(object):
             if files_analyzed:
                 if validations.validate_pkg_files_analyzed(files_analyzed):
                     self.package_files_analyzed_set = True
-                    doc.package.files_analyzed = files_analyzed
-                    print(doc.package.files_analyzed)
+                    doc.packages[-1].files_analyzed = files_analyzed
                     return True
                 else:
                     raise SPDXValueError('Package::FilesAnalyzed')
@@ -702,7 +716,7 @@ class PackageBuilder(object):
         if not self.package_home_set:
             self.package_home_set = True
             if validations.validate_pkg_homepage(location):
-                doc.package.homepage = location
+                doc.packages[-1].homepage = location
                 return True
             else:
                 raise SPDXValueError('Package::HomePage')
@@ -722,9 +736,11 @@ class PackageBuilder(object):
             self.package_verif_set = True
             match = self.VERIF_CODE_REGEX.match(code)
             if match:
-                doc.package.verif_code = match.group(self.VERIF_CODE_CODE_GRP)
+                doc.packages[-1].verif_code = match.group(
+                        self.VERIF_CODE_CODE_GRP)
                 if match.group(self.VERIF_CODE_EXC_FILES_GRP) is not None:
-                    doc.package.verif_exc_files = match.group(self.VERIF_CODE_EXC_FILES_GRP).split(',')
+                    doc.packages[-1].verif_exc_files = match.group(
+                            self.VERIF_CODE_EXC_FILES_GRP).split(',')
                 return True
             else:
                 raise SPDXValueError('Package::VerificationCode')
@@ -741,7 +757,7 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_chk_sum_set:
             self.package_chk_sum_set = True
-            doc.package.check_sum = checksum_from_sha1(chk_sum)
+            doc.packages[-1].check_sum = checksum_from_sha1(chk_sum)
             return True
         else:
             raise CardinalityError('Package::CheckSum')
@@ -758,7 +774,7 @@ class PackageBuilder(object):
         if not self.package_source_info_set:
             self.package_source_info_set = True
             if validations.validate_pkg_src_info(text):
-                doc.package.source_info = str_from_text(text)
+                doc.packages[-1].source_info = str_from_text(text)
                 return True
             else:
                 raise SPDXValueError('Pacckage::SourceInfo')
@@ -777,7 +793,7 @@ class PackageBuilder(object):
         if not self.package_conc_lics_set:
             self.package_conc_lics_set = True
             if validations.validate_lics_conc(licenses):
-                doc.package.conc_lics = licenses
+                doc.packages[-1].conc_lics = licenses
                 return True
             else:
                 raise SPDXValueError('Package::ConcludedLicenses')
@@ -792,7 +808,7 @@ class PackageBuilder(object):
         """
         self.assert_package_exists()
         if validations.validate_lics_from_file(lic):
-            doc.package.licenses_from_files.append(lic)
+            doc.packages[-1].licenses_from_files.append(lic)
             return True
         else:
             raise SPDXValueError('Package::LicensesFromFile')
@@ -808,7 +824,7 @@ class PackageBuilder(object):
         if not self.package_license_declared_set:
             self.package_license_declared_set = True
             if validations.validate_lics_conc(lic):
-                doc.package.license_declared = lic
+                doc.packages[-1].license_declared = lic
                 return True
             else:
                 raise SPDXValueError('Package::LicenseDeclared')
@@ -826,7 +842,7 @@ class PackageBuilder(object):
         if not self.package_license_comment_set:
             self.package_license_comment_set = True
             if validations.validate_pkg_lics_comment(text):
-                doc.package.license_comment = str_from_text(text)
+                doc.packages[-1].license_comment = str_from_text(text)
                 return True
             else:
                 raise SPDXValueError('Package::LicenseComment')
@@ -845,9 +861,9 @@ class PackageBuilder(object):
             self.package_cr_text_set = True
             if validations.validate_pkg_cr_text(text):
                 if isinstance(text, string_types):
-                    doc.package.cr_text = str_from_text(text)
+                    doc.packages[-1].cr_text = str_from_text(text)
                 else:
-                    doc.package.cr_text = text  # None or NoAssert
+                    doc.packages[-1].cr_text = text  # None or NoAssert
             else:
                 raise SPDXValueError('Package::CopyrightText')
         else:
@@ -864,7 +880,7 @@ class PackageBuilder(object):
         if not self.package_summary_set:
             self.package_summary_set = True
             if validations.validate_pkg_summary(text):
-                doc.package.summary = str_from_text(text)
+                doc.packages[-1].summary = str_from_text(text)
             else:
                 raise SPDXValueError('Package::Summary')
         else:
@@ -881,7 +897,7 @@ class PackageBuilder(object):
         if not self.package_desc_set:
             self.package_desc_set = True
             if validations.validate_pkg_desc(text):
-                doc.package.description = str_from_text(text)
+                doc.packages[-1].description = str_from_text(text)
             else:
                 raise SPDXValueError('Package::Description')
         else:
@@ -898,7 +914,7 @@ class PackageBuilder(object):
         if not self.package_comment_set:
             self.package_comment_set = True
             if validations.validate_pkg_comment(text):
-                doc.package.comment = str_from_text(text)
+                doc.packages[-1].comment = str_from_text(text)
             else:
                 raise SPDXValueError('Package::Comment')
         else:
@@ -910,26 +926,27 @@ class PackageBuilder(object):
         """
         self.assert_package_exists()
         if validations.validate_pkg_ext_ref_category(category):
-            if (len(doc.package.pkg_ext_refs) and
-                    doc.package.pkg_ext_refs[-1].category is None):
-                doc.package.pkg_ext_refs[-1].category = category
+            if (len(doc.packages[-1].pkg_ext_refs) and
+                    doc.packages[-1].pkg_ext_refs[-1].category is None):
+                doc.packages[-1].pkg_ext_refs[-1].category = category
             else:
-                doc.package.add_pkg_ext_refs(
+                doc.packages[-1].add_pkg_ext_refs(
                     package.ExternalPackageRef(category=category))
         else:
             raise SPDXValueError('ExternalRef::Category')
 
     def set_pkg_ext_ref_type(self, doc, pkg_ext_ref_type):
         """
-        Set the `pkg_ext_ref_type` attribute of the `ExternalPackageRef` object.
+        Set the `pkg_ext_ref_type` attribute of the `ExternalPackageRef`
+        object.
         """
         self.assert_package_exists()
         if validations.validate_pkg_ext_ref_type(pkg_ext_ref_type):
-            if (len(doc.package.pkg_ext_refs) and
-                    doc.package.pkg_ext_refs[-1].pkg_ext_ref_type is None):
-                doc.package.pkg_ext_refs[-1].pkg_ext_ref_type = pkg_ext_ref_type
+            if (len(doc.packages[-1].pkg_ext_refs) and
+                    doc.packages[-1].pkg_ext_refs[-1].pkg_ext_ref_type is None):
+                doc.packages[-1].pkg_ext_refs[-1].pkg_ext_ref_type = pkg_ext_ref_type
             else:
-                doc.package.add_pkg_ext_refs(package.ExternalPackageRef(
+                doc.packages[-1].add_pkg_ext_refs(package.ExternalPackageRef(
                     pkg_ext_ref_type=pkg_ext_ref_type))
         else:
             raise SPDXValueError('ExternalRef::Type')
@@ -939,11 +956,11 @@ class PackageBuilder(object):
         Set the `locator` attribute of the `ExternalPackageRef` object.
         """
         self.assert_package_exists()
-        if (len(doc.package.pkg_ext_refs) and
-                doc.package.pkg_ext_refs[-1].locator is None):
-            doc.package.pkg_ext_refs[-1].locator = locator
+        if (len(doc.packages[-1].pkg_ext_refs) and
+                doc.packages[-1].pkg_ext_refs[-1].locator is None):
+            doc.packages[-1].pkg_ext_refs[-1].locator = locator
         else:
-            doc.package.add_pkg_ext_refs(package.ExternalPackageRef(
+            doc.packages[-1].add_pkg_ext_refs(package.ExternalPackageRef(
                 locator=locator))
 
     def add_pkg_ext_ref_comment(self, doc, comment):
@@ -951,11 +968,11 @@ class PackageBuilder(object):
         Set the `comment` attribute of the `ExternalPackageRef` object.
         """
         self.assert_package_exists()
-        if not len(doc.package.pkg_ext_refs):
+        if not len(doc.packages[-1].pkg_ext_refs):
             raise OrderError('Package::ExternalRef')
         else:
             if validations.validate_pkg_ext_ref_comment(comment):
-                doc.package.pkg_ext_refs[-1].comment = str_from_text(comment)
+                doc.packages[-1].pkg_ext_refs[-1].comment = str_from_text(comment)
             else:
                 raise SPDXValueError('ExternalRef::Comment')
 
@@ -980,7 +997,7 @@ class FileBuilder(object):
         Raise OrderError if no package defined.
         """
         if self.has_package(doc):
-            doc.package.files.append(file.File(name))
+            doc.packages[-1].files.append(file.File(name))
             # A file name marks the start of a new file instance.
             # The builder must be reset
             # FIXME: this state does not make sense
