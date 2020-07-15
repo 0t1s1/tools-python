@@ -256,9 +256,9 @@ def write_package(package, out):
             write_text_value('ExternalRefComment', pkg_ref.comment, out)
 
     # Write sorted files.
-    for spdx_file in sorted(package.files):
+    for spdx_file_ in sorted(package.files):
         write_separators(out)
-        write_file(spdx_file, out)
+        write_file(spdx_file_, out)
 
 
 def write_extracted_licenses(lics, out):
@@ -325,8 +325,9 @@ def write_document(document, out, validate=True):
         write_separators(out)
 
     # Write out package info
-    write_package(document.package, out)
-    write_separators(out)
+    for package in document.packages:
+        write_package(package, out)
+        write_separators(out)
 
     # Write out snippet info
     for snippet in document.snippet:
