@@ -79,7 +79,8 @@ class TestDocument(TestCase):
         doc = Document(Version(2, 1), License.from_identifier('CC0-1.0'),
                        'Sample_Document-V2.1', spdx_id='SPDXRef-DOCUMENT',
                        namespace='https://spdx.org/spdxdocs/spdx-example-444504E0-4F89-41D3-9A0C-0305E82C3301')
-        pack = doc.package = Package('some/path', NoAssert())
+        pack = Package('some/path', NoAssert())
+        doc.add_package(pack)
         file1 = File('./some/path/tofile')
         file1.name = './some/path/tofile'
         file1.spdx_id = 'SPDXRef-File'
@@ -111,7 +112,8 @@ class TestDocument(TestCase):
         doc.creation_info.add_creator(Tool('ScanCode'))
         doc.creation_info.set_created_now()
 
-        package = doc.package = Package(name='some/path', download_location=NoAssert())
+        package = Package(name='some/path', download_location=NoAssert())
+        doc.add_package(package)
         package.spdx_id = 'SPDXRef-Package'
         package.cr_text = 'Some copyrught'
         package.verif_code = 'SOME code'
@@ -146,7 +148,8 @@ class TestWriters(TestCase):
         doc.creation_info.add_creator(Tool('ScanCode'))
         doc.creation_info.set_created_now()
 
-        package = doc.package = Package(name='some/path', download_location=NoAssert())
+        package = Package(name='some/path', download_location=NoAssert())
+        doc.add_package(package)
         package.spdx_id = 'SPDXRef-Package'
         package.cr_text = 'Some copyrught'
         package.verif_code = 'SOME code'
@@ -380,7 +383,8 @@ class TestWriters(TestCase):
         doc.creation_info.add_creator(Tool('ScanCode'))
         doc.creation_info.set_created_now()
 
-        package = doc.package = Package(download_location=NoAssert())
+        package = Package(download_location=NoAssert())
+        doc.add_package(package)
         package.license_declared = NoAssert()
         package.conc_lics = NoAssert()
         return doc
