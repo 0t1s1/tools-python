@@ -259,7 +259,7 @@ class Document(object):
     - comment: Comments on the SPDX file, optional one. Type: str
     - namespace: SPDX document specific namespace. Mandatory, one. Type: str
     - creation_info: SPDX file creation info. Mandatory, one. Type: CreationInfo
-    - package: Package described by this document. Mandatory, one. Type: Package
+    - packages: Packages described by this document. Mandatory, one or many. Type: Package
     - extracted_licenses: List of licenses extracted that are not part of the
       SPDX license list. Optional, many. Type: ExtractedLicense.
     - reviews: SPDX document review information, Optional zero or more.
@@ -270,7 +270,7 @@ class Document(object):
     """
 
     def __init__(self, version=None, data_license=None, name=None, spdx_id=None,
-                 namespace=None, comment=None, package=None):
+                 namespace=None, comment=None, packages=[]):
         # avoid recursive impor
         from spdx.creationinfo import CreationInfo
         self.version = version
@@ -281,7 +281,7 @@ class Document(object):
         self.comment = comment
         self.namespace = namespace
         self.creation_info = CreationInfo()
-        self.package = package
+        self.packages = packages
         self.extracted_licenses = []
         self.reviews = []
         self.annotations = []
@@ -304,11 +304,18 @@ class Document(object):
 
     @property
     def files(self):
-        return self.package.files
+        files = []
+        for package in self.packages:
+            files += package.files
+        return files
 
-    @files.setter
-    def files(self, value):
-        self.package.files = value
+    # FIXME: set files how?
+    #@files.setter
+    #def files(self, value):
+    #    self.package.files = value
+
+    def add_package(self, package):
+        self.packages.append(package)
 
     @property
     def has_comment(self):
@@ -326,7 +333,7 @@ class Document(object):
         messages = self.validate_namespace(messages)
         messages = self.validate_ext_document_references(messages)
         messages = self.validate_creation_info(messages)
-        messages = self.validate_package(messages)
+        messages = self.validate_packages(messages)
         messages = self.validate_extracted_licenses(messages)
         messages = self.validate_reviews(messages)
         messages = self.validate_snippet(messages)
@@ -409,9 +416,10 @@ class Document(object):
 
         return messages
 
-    def validate_package(self, messages):
-        if self.package is not None:
-            messages = self.package.validate(messages)
+    def validate_packages(self, messages):
+        if self.packages:
+            for package in self.packages:
+                messages = package.validate(messages)
         else:
             messages = messages + ['Document has no package.']
 
