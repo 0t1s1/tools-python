@@ -176,8 +176,8 @@ class File(object):
             ]
         else:
             chksums = ['SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'MD2', 'MD4', 'MD5', 'MD6']
-            if not self.chk_sum.identifier not in chksums:
-                messages = messages + ['Invalid file checksum algorithm ' + self.chk_sum.identifier]
+            if self.chk_sum.identifier not in chksums:
+                messages = messages + ['Invalid file checksum algorithm: ' + self.chk_sum.identifier]
 
         return messages
 
