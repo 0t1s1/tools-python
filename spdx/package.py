@@ -239,7 +239,7 @@ class Package(object):
             ]
         else:
             chksums = ['SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'MD2', 'MD4', 'MD5', 'MD6']
-            if self.chk_sum.identifier not in chksums:
+            if self.check_sum.identifier not in chksums:
                 messages = messages + ['Invalid package checksum algorithm: ' + self.chk_sum.identifier]
 
         return messages
