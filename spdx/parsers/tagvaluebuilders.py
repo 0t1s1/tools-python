@@ -1204,25 +1204,28 @@ class FileBuilder(object):
         else:
             raise OrderError('File::Artificat')
 
-
     def file(self, doc):
         """
-        Return the last file in the document's package's file list.
+        Return the last file in the document's file list of the last
+        package.
         """
-        return doc.package.files[-1]
+        return doc.packages[-1].files[-1]
 
     def has_file(self, doc):
         """
-        Return true if the document's package has at least one file.
+        Return true if the document's packages have at least one file.
         Does not test if the document has a package.
         """
-        return len(doc.package.files) != 0
+        n_files = 0
+        for pack in doc.packages:
+            n_files += len(pack.files)
+        return n_files != 0
 
     def has_package(self, doc):
         """
-        Return true if the document has a package.
+        Return true if the document has at least one package.
         """
-        return doc.package is not None
+        return doc.packages is not None
 
     def reset_file_stat(self):
         """
