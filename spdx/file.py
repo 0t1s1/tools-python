@@ -175,8 +175,9 @@ class File(object):
                 'File checksum must be instance of spdx.checksum.Algorithm'
             ]
         else:
-            if not self.chk_sum.identifier == 'SHA1':
-                messages = messages + ['File checksum algorithm must be SHA1']
+            chksums = ['SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512', 'MD2', 'MD4', 'MD5', 'MD6']
+            if not self.chk_sum.identifier not in chksums:
+                messages = messages + ['Invalid file checksum algorithm ' + self.chk_sum.identifier]
 
         return messages
 
