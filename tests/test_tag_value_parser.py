@@ -298,24 +298,24 @@ class TestParser(TestCase):
         document, error = self.p.parse(self.complete_str)
         assert document is not None
         assert not error
-        assert document.package.name == 'Test'
-        assert document.package.spdx_id == 'SPDXRef-Package'
-        assert document.package.version == 'Version 0.9.2'
-        assert len(document.package.licenses_from_files) == 2
-        assert (document.package.conc_lics.identifier == 'LicenseRef-2.0 AND Apache-2.0')
-        assert document.package.files_analyzed == 'False'
-        assert document.package.comment == 'Comment on the package.'
-        assert document.package.pkg_ext_refs[-1].category == 'SECURITY'
-        assert document.package.pkg_ext_refs[-1].pkg_ext_ref_type == 'cpe23Type'
-        assert document.package.pkg_ext_refs[-1].locator == 'cpe:2.3:a:pivotal_software:spring_framework:4.1.0:*:*:*:*:*:*:'
-        assert document.package.pkg_ext_refs[-1].comment == 'Some comment about the package.'
+        assert document.packages[-1].name == 'Test'
+        assert document.packages[-1].spdx_id == 'SPDXRef-Package'
+        assert document.packages[-1].version == 'Version 0.9.2'
+        assert len(document.packages[-1].licenses_from_files) == 2
+        assert (document.packages[-1].conc_lics.identifier == 'LicenseRef-2.0 AND Apache-2.0')
+        assert document.packages[-1].files_analyzed == 'False'
+        assert document.packages[-1].comment == 'Comment on the package.'
+        assert document.packages[-1].pkg_ext_refs[-1].category == 'SECURITY'
+        assert document.packages[-1].pkg_ext_refs[-1].pkg_ext_ref_type == 'cpe23Type'
+        assert document.packages[-1].pkg_ext_refs[-1].locator == 'cpe:2.3:a:pivotal_software:spring_framework:4.1.0:*:*:*:*:*:*:'
+        assert document.packages[-1].pkg_ext_refs[-1].comment == 'Some comment about the package.'
 
     def test_file(self):
         document, error = self.p.parse(self.complete_str)
         assert document is not None
         assert not error
-        assert len(document.package.files) == 1
-        spdx_file = document.package.files[0]
+        assert len(document.packages[-1].files) == 1
+        spdx_file = document.packages[-1].files[0]
         assert spdx_file.name == 'testfile.java'
         assert spdx_file.spdx_id == 'SPDXRef-File'
         assert spdx_file.type == spdx.file.FileType.SOURCE
