@@ -36,16 +36,57 @@ from spdx.parsers.builderexceptions import SPDXValueError
 from spdx.parsers import validations
 
 
-def checksum_from_sha1(value):
+def checksum_from_digest(value):
     """
-    Return an spdx.checksum.Algorithm instance representing the SHA1
-    checksum or None if does not match CHECKSUM_RE.
+    Return an spdx.checksum.Algorithm instance representing the
+    specified algorithm checksum or None if does not match any
+    CHECKSUM_RE.
     """
     # More constrained regex at lexer level
     CHECKSUM_RE = re.compile('SHA1:\\s*([\\S]+)', re.UNICODE)
     match = CHECKSUM_RE.match(value)
     if match:
         return checksum.Algorithm(identifier='SHA1', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('SHA224:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='SHA224', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('SHA256:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='SHA256', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('SHA384:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='SHA384', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('SHA512:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='SHA512', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('MD2:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='MD2', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('MD4:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='MD4', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('MD5:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='MD5', value=match.group(1))
+
+    CHECKSUM_RE = re.compile('MD6:\\s*([\\S]+)', re.UNICODE)
+    match = CHECKSUM_RE.match(value)
+    if match:
+        return checksum.Algorithm(identifier='MD6', value=match.group(1))
     else:
         return None
 
@@ -202,7 +243,7 @@ class ExternalDocumentRefBuilder(object):
         """
         Set the `check_sum` attribute of the `ExternalDocumentRef` object.
         """
-        doc.ext_document_references[-1].check_sum = checksum_from_sha1(
+        doc.ext_document_references[-1].check_sum = checksum_from_digest(
             chksum)
 
     def add_ext_doc_refs(self, doc, ext_doc_id, spdx_doc_uri, chksum):
@@ -741,7 +782,7 @@ class PackageBuilder(object):
         self.assert_package_exists()
         if not self.package_chk_sum_set:
             self.package_chk_sum_set = True
-            doc.package.check_sum = checksum_from_sha1(chk_sum)
+            doc.package.check_sum = checksum_from_digest(chk_sum)
             return True
         else:
             raise CardinalityError('Package::CheckSum')
@@ -1061,7 +1102,7 @@ class FileBuilder(object):
         if self.has_package(doc) and self.has_file(doc):
             if not self.file_chksum_set:
                 self.file_chksum_set = True
-                self.file(doc).chk_sum = checksum_from_sha1(chksum)
+                self.file(doc).chk_sum = checksum_from_digest(chksum)
                 return True
             else:
                 raise CardinalityError('File::CheckSum')
