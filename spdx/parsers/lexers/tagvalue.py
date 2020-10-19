@@ -147,7 +147,7 @@ class Lexer(object):
         return t
 
     def t_EXT_DOC_REF_CHKSUM(self, t):
-        r':\s*(SHA1:\s*[a-f0-9]{40,40}|SHA224:\s*[a-f0-9]{56,56}|SHA384:\s*[a-f0-9]{96,96}|SHA256:\s*[a-f0-9]{64,64}|SHA512:\s*[a-f0-9]{128,128}|MD(2|4|5):\s*[a-f0-9]{32,32}|MD6:\s*[a-f0-9]{0,128})'
+        r'\s*(SHA1:\s*[a-f0-9]{40,40}|SHA224:\s*[a-f0-9]{56,56}|SHA384:\s*[a-f0-9]{96,96}|SHA256:\s*[a-f0-9]{64,64}|SHA512:\s*[a-f0-9]{128,128}|MD(2|4|5):\s*[a-f0-9]{32,32}|MD6:\s*[a-f0-9]{0,128})'
         t.value = t.value[1:].strip()
         return t
 

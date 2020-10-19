@@ -37,7 +37,7 @@ from spdx.parsers import validations
 
 chksum_re_map = {
     "SHA1": re.compile('SHA1:\\s*([\\S]+)', re.UNICODE),
-    "SHA224": compile('SHA224:\\s*([\\S]+)', re.UNICODE),
+    "SHA224": re.compile('SHA224:\\s*([\\S]+)', re.UNICODE),
     "SHA256": re.compile('SHA256:\\s*([\\S]+)', re.UNICODE),
     "SHA384": re.compile('SHA384:\\s*([\\S]+)', re.UNICODE),
     "SHA512": re.compile('SHA512:\\s*([\\S]+)', re.UNICODE),
