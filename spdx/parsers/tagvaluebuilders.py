@@ -35,6 +35,18 @@ from spdx.parsers.builderexceptions import OrderError
 from spdx.parsers.builderexceptions import SPDXValueError
 from spdx.parsers import validations
 
+chksum_re_map = {
+    "SHA1": re.compile('SHA1:\\s*([\\S]+)', re.UNICODE),
+    "SHA224": re.compile('SHA224:\\s*([\\S]+)', re.UNICODE),
+    "SHA256": re.compile('SHA256:\\s*([\\S]+)', re.UNICODE),
+    "SHA384": re.compile('SHA384:\\s*([\\S]+)', re.UNICODE),
+    "SHA512": re.compile('SHA512:\\s*([\\S]+)', re.UNICODE),
+    "MD2": re.compile('MD2:\\s*([\\S]+)', re.UNICODE),
+    "MD4": re.compile('MD4:\\s*([\\S]+)', re.UNICODE),
+    "MD5": re.compile('MD5:\\s*([\\S]+)', re.UNICODE),
+    "MD6": re.compile('MD6:\\s*([\\S]+)', re.UNICODE)
+}
+
 
 def checksum_from_digest(value):
     """
@@ -43,52 +55,12 @@ def checksum_from_digest(value):
     CHECKSUM_RE.
     """
     # More constrained regex at lexer level
-    CHECKSUM_RE = re.compile('SHA1:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='SHA1', value=match.group(1))
+    for algo, CHECKSUM_RE in chksum_re_map.items():
+        match = CHECKSUM_RE.match(value)
+        if match:
+            return checksum.Algorithm(identifier=algo, value=match.group(1))
 
-    CHECKSUM_RE = re.compile('SHA224:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='SHA224', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('SHA256:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='SHA256', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('SHA384:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='SHA384', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('SHA512:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='SHA512', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('MD2:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='MD2', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('MD4:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='MD4', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('MD5:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='MD5', value=match.group(1))
-
-    CHECKSUM_RE = re.compile('MD6:\\s*([\\S]+)', re.UNICODE)
-    match = CHECKSUM_RE.match(value)
-    if match:
-        return checksum.Algorithm(identifier='MD6', value=match.group(1))
-    else:
-        return None
+    return None
 
 
 def str_from_text(text):
